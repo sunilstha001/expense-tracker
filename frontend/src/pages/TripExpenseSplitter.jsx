@@ -83,6 +83,11 @@ const TripExpenseSplitter = () => {
     return total / count;
   }, [expenseForm.totalAmount, expenseForm.splitUserIds.length]);
 
+  const selectedMemberIdsKey = useMemo(
+    () => selectedGroupMembers.map((member) => String(member._id)).sort().join("|"),
+    [selectedGroupMembers],
+  );
+
   const totalTripExpense = useMemo(
     () =>
       groupExpenses.reduce(
@@ -195,13 +200,29 @@ const TripExpenseSplitter = () => {
       setExpenseForm({ ...defaultExpenseForm, category: "" });
       return;
     }
+
+    const memberIdSet = new Set(selectedGroupMembers.map((member) => String(member._id)));
     setExpenseForm((prev) => ({
       ...prev,
-      paidBy: "",
-      category: "",
-      splitUserIds: selectedGroupMembers.map((member) => member._id),
+      splitUserIds:
+        prev.splitUserIds.filter((id) => memberIdSet.has(String(id))).length > 0
+          ? prev.splitUserIds.filter((id) => memberIdSet.has(String(id)))
+          : selectedGroupMembers.map((member) => member._id),
     }));
-  }, [selectedGroupId, selectedGroupMembers, selectedGroup]);
+  }, [selectedGroupId, selectedMemberIdsKey]);
+
+  const handleTotalAmountChange = (rawValue) => {
+    if (rawValue === "") {
+      setExpenseForm((prev) => ({ ...prev, totalAmount: "" }));
+      return;
+    }
+
+    const sanitized = rawValue
+      .replace(/[^\d.]/g, "")
+      .replace(/(\..*)\./g, "$1");
+
+    setExpenseForm((prev) => ({ ...prev, totalAmount: sanitized }));
+  };
 
   const toggleSelected = (list, value) =>
     list.includes(value) ? list.filter((id) => id !== value) : [...list, value];
@@ -747,12 +768,11 @@ const TripExpenseSplitter = () => {
               className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
             />
             <input
-              type="number"
-              min="0"
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
               value={expenseForm.totalAmount}
-              onChange={(e) =>
-                setExpenseForm((prev) => ({ ...prev, totalAmount: e.target.value }))
-              }
+              onChange={(e) => handleTotalAmountChange(e.target.value)}
               placeholder="Total amount"
               className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
             />
