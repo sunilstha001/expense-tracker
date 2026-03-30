@@ -3,6 +3,11 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const getUserIdFromTokenPayload = (payload) => {
+    if (!payload || typeof payload !== "object") return null;
+    return payload.id || payload._id || payload.userId || payload.sub || null;
+};
+
 export default async function authMiddleware(req, res, next) {
     // grab the token
     const authHeader = req.headers.authorization;
@@ -17,7 +22,15 @@ export default async function authMiddleware(req, res, next) {
     // to verify the token
     try {
         const payload = jwt.verify(token, JWT_SECRET);
-        const user = await User.findById(payload.id).select("-password");
+        const userId = getUserIdFromTokenPayload(payload);
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Token payload invalid"
+            });
+        }
+
+        const user = await User.findById(userId).select("-password");
         if (!user) {
             return res.status(401).json({
                 success: false,

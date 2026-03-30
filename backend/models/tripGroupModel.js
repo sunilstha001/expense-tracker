@@ -33,11 +33,10 @@ const tripGroupSchema = new mongoose.Schema(
   },
 );
 
-tripGroupSchema.pre("save", function applyDefaultCategories(next) {
+tripGroupSchema.pre("save", function applyDefaultCategories() {
   if (!this.categories || this.categories.length === 0) {
     this.categories = DEFAULT_TRIP_CATEGORIES;
   }
-  next();
 });
 
 const tripGroupModel =

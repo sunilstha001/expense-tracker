@@ -167,7 +167,19 @@ const TripExpenseSplitter = () => {
   }, []);
 
   useEffect(() => {
-    Promise.all([fetchGroupExpenses(selectedGroupId), fetchGroupSettlement(selectedGroupId)]);
+    const syncSelectedGroupData = async () => {
+      try {
+        await Promise.all([
+          fetchGroupExpenses(selectedGroupId),
+          fetchGroupSettlement(selectedGroupId),
+        ]);
+      } catch (error) {
+        console.error(error);
+        alert(error?.response?.data?.message || "Failed to load selected group data.");
+      }
+    };
+
+    syncSelectedGroupData();
   }, [selectedGroupId]);
 
   useEffect(() => {
@@ -195,6 +207,11 @@ const TripExpenseSplitter = () => {
     list.includes(value) ? list.filter((id) => id !== value) : [...list, value];
 
   const handleCreateGroup = async () => {
+    if (!token) {
+      alert("Please login again. Your session is missing.");
+      return;
+    }
+
     if (!groupName.trim()) {
       alert("Please enter a group name.");
       return;

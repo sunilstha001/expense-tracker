@@ -7,6 +7,11 @@ let io;
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const getUserIdFromTokenPayload = (payload) => {
+  if (!payload || typeof payload !== "object") return null;
+  return payload.id || payload._id || payload.userId || payload.sub || null;
+};
+
 const groupRoom = (groupId) => `trip:group:${String(groupId)}`;
 const userRoom = (userId) => `trip:user:${String(userId)}`;
 
@@ -35,7 +40,12 @@ export const initializeSocket = (httpServer) => {
       }
 
       const payload = jwt.verify(token, JWT_SECRET);
-      const user = await User.findById(payload.id).select("_id");
+      const userId = getUserIdFromTokenPayload(payload);
+      if (!userId) {
+        return next(new Error("Unauthorized: token payload invalid"));
+      }
+
+      const user = await User.findById(userId).select("_id");
       if (!user) {
         return next(new Error("Unauthorized: user not found"));
       }
