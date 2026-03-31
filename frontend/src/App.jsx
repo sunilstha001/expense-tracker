@@ -15,6 +15,7 @@ import Income from "./pages/Income";
 import Expense from "./pages/Expense";
 import Profile from "./pages/Profile";
 import TripExpenseSplitter from "./pages/TripExpenseSplitter";
+import ComingSoon from "./pages/ComingSoon";
 import { API_BASE } from "./utils/api";
 
 // to get transaction from localstorage
@@ -271,6 +272,7 @@ const App = () => {
           />
 
           <Route path="/trip-expense-splitter" element={<TripExpenseSplitter />} />
+          <Route path="/support" element={<ComingSoon />} />
         </Route>
 
         <Route

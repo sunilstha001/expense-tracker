@@ -203,7 +203,7 @@ const Sidebar = ({ user, isCollapsed, setIsCollapsed }) => {
                 sidebarStyles.footerLink.base,
                 isCollapsed && sidebarStyles.footerLink.collapsed,
               )}
-              to="https://www.hexagondigitalservices.com/contact"
+              to="/support"
             >
               <HelpCircle size={20} className=" text-gray-500" />
               {!isCollapsed && <span>Support</span>}
@@ -310,7 +310,7 @@ const Sidebar = ({ user, isCollapsed, setIsCollapsed }) => {
                 <div className={sidebarStyles.mobileFooter}>
                   <Link
                     onClick={() => setMobileOpen(false)}
-                    to="https://www.hexagondigitalservices.com/contact"
+                    to="/support"
                     className={sidebarStyles.mobileFooterLink}
                   >
                     <HelpCircle size={20} className=" text-gray-500" />
